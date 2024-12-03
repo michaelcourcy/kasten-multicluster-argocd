@@ -55,4 +55,4 @@ spec:
     - match:
         secretKey: token
         remoteRef:
-          remoteKey: mcourcy-multicluster5-join-token
+          remoteKey: mcourcy-multicluster1-join-token

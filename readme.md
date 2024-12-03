@@ -63,6 +63,7 @@ metadata:
 spec:
   destination:
     namespace: kasten-io
+    # adapt this value to your configuration
     server: https://kasten-se-guf1s564.hcp.westus.azmk8s.io:443
   project: default
   source:
@@ -74,6 +75,19 @@ spec:
 EOF
 ```
 
+# Check multicluster deployment 
+
+On the primary all the resources should be healthy especially the `pushSecret` because it was able to find the token key in the `join-token-secret` secret.
+
+![Argo primary](./images/primary-argo.png)
+
+On the secondary you notice the ownership between the `externaSecret` and the join secret `mc-join`
+
+![Argo secondary](./images/secondary-argo.png)
+
+Finally you should see on the primary cluster the multicluster automatically deployed
+
+![Multicluster console](./images/multi-cluster-console.png)
 
 # Clean multicluster installation 
 

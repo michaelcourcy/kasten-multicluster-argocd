@@ -24,4 +24,4 @@ spec:
   data:
   - secretKey: token
     remoteRef:
-      key: mcourcy-multicluster5-join-token
+      key: mcourcy-multicluster1-join-token
