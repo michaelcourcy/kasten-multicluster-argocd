@@ -1,0 +1,50 @@
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: kasten-io-mc
+---
+apiVersion: dist.kio.kasten.io/v1alpha1
+kind: Bootstrap
+metadata:
+ name: bootstrap-primary
+ namespace: kasten-io-mc
+spec:
+ clusters:
+     primary-cluster:
+         name: primary
+         primary: true
+         k10:
+             namespace: kasten-io
+             releaseName: k10
+             ingress:
+                 url: https://mcourcy-primary.customers.kastenevents.com/k10
+---
+apiVersion: v1
+kind: Secret
+metadata:
+ name: join-token-secret
+ namespace: kasten-io-mc
+type: dist.kio.kasten.io/join-token
+---
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: mcourcy-multicluster1-join-token
+  namespace: kasten-io-mc
+spec:
+  refreshInterval: 1h # Refresh interval for which push secret will reconcile
+  deletionPolicy: Delete
+  updatePolicy: Replace
+  secretStoreRefs: # A list of secret stores to push secrets to
+    - name: azurekv-mcourcy-join-tokens-store
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      name: join-token-secret
+  data:
+    - match:
+        secretKey: token
+        remoteRef:
+          remoteKey: mcourcy-multicluster2-join-token

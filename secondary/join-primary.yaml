@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: mc-join-config
+ namespace: kasten-io
+data:
+ cluster-name: secondary
+ cluster-ingress: https://kasten.mcourcy-secondary.customers.kastenevents.com/k10
+ primary-ingress: https://kasten.mcourcy-primary.customers.kastenevents.com/k10
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: mc-join
+  namespace: kasten-io
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: azurekv-mcourcy-join-tokens-store
+  target:
+    name: mc-join
+    creationPolicy: Owner
+  data:
+  - secretKey: token
+    remoteRef:
+      key: mcourcy-multicluster2-join-token
