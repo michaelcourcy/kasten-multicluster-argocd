@@ -33,7 +33,7 @@ Doing this is accually quite easy it require to deploy the manifest in [primary]
 
 # Deploy the multicluster configuration with ArgoCD 
 
-Given the prerequisites deploying the multicluster configuration is a matter on deploying manifest on primary and secondary.
+Given the prerequisites deploying the multicluster configuration is a matter of deploying manifest on primary and secondary.
 
 To accomplish this with argo is a matter of defining 2 applications pointing on each cluster 
 ```
