@@ -2,12 +2,16 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   creationTimestamp: null
   name: kasten-io-mc
 ---
 apiVersion: dist.kio.kasten.io/v1alpha1
 kind: Bootstrap
 metadata:
+ annotations:
+    argocd.argoproj.io/sync-wave: "0"
  name: bootstrap-primary
  namespace: kasten-io-mc
 spec:
@@ -24,6 +28,8 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
+ annotations:
+    argocd.argoproj.io/sync-wave: "1"
  name: join-token-secret
  namespace: kasten-io-mc
 type: dist.kio.kasten.io/join-token
@@ -31,6 +37,8 @@ type: dist.kio.kasten.io/join-token
 apiVersion: external-secrets.io/v1alpha1
 kind: PushSecret
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   name: mcourcy-multicluster1-join-token
   namespace: kasten-io-mc
 spec:
@@ -47,4 +55,4 @@ spec:
     - match:
         secretKey: token
         remoteRef:
-          remoteKey: mcourcy-multicluster4-join-token
+          remoteKey: mcourcy-multicluster5-join-token
