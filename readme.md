@@ -21,6 +21,8 @@ This is summarized in this diagram:
 
 # Prerequisite : 
 
+Doing this is accually quite easy it require to deploy the manifest in [primary](./primary/) and [secondary](./secondary/). The hardest part is having proper prerequisites. 
+
 - Kasten is installed on both cluster with an ingress controller and proper certificate. ([Annex 1](./annex1/)).
 - Argo is installed on the primary cluster and we reference the secondary as a target deployment. ([Annex 2](./annex2/)).
 - External secret operator is installed on both cluster using the same azure vault [secret store backend](https://external-secrets.io/latest/provider/azure-key-vault/) ([Annex 3](./annex3/)).
@@ -35,8 +37,40 @@ Given the prerequisites deploying the multicluster configuration is a matter on 
 
 To accomplish this with argo is a matter of defining 2 applications pointing on each cluster 
 ```
-cat <<EOF 
-
+cat <<EOF | kubectl create -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: primary
+  namespace: argocd
+spec:
+  destination:
+    namespace: kasten-io-mc
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: primary
+    repoURL: https://github.com/michaelcourcy/kasten-multicluster-argocd
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: secondary
+  namespace: argocd
+spec:
+  destination:
+    namespace: kasten-io
+    server: https://kasten-se-guf1s564.hcp.westus.azmk8s.io:443
+  project: default
+  source:
+    path: secondary
+    repoURL: https://github.com/michaelcourcy/kasten-multicluster-argocd
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
 EOF
 ```
 
@@ -48,9 +82,11 @@ https://docs.kasten.io/latest/multicluster/how-tos/disconnect.html
 ## On the primary 
 
 ```
-kubectl delete cluster secondary -n kasten-io-mc # wait for the primary cleaning up resource on the secondary
+kubectl delete cluster secondary -n kasten-io-mc 
+# wait for the primary cleaning up resource on the secondary
 kubectl delete cluster primary -n kasten-io-mc
-kubectl delete delete -n kasten-io-mc pushsecret mcourcy-multicluster1-join-token
+kubectl delete -n kasten-io-mc pushsecret mcourcy-multicluster1-join-token
+kubectl delete ns kasten-io-mc
 ```
 
 ## On the secondary 
