@@ -23,7 +23,7 @@ spec:
              namespace: kasten-io
              releaseName: k10
              ingress:
-                 url: https://mcourcy-primary.customers.kastenevents.com/k10
+                 url: https://kasten.mcourcy-primary.customers.kastenevents.com/k10
 ---
 apiVersion: v1
 kind: Secret
