@@ -114,5 +114,11 @@ kubectl delete -n kasten-io cm mc-join-config
 kubectl delete -n kasten-io secret mc-cluster-info
 ```
 
+# Using helm
 
+Often you want to use helm with argocd when you have multiple clusters to manage.
+
+By separating template and variables you create a better normalization of your deployment accross your clusters.
+
+An example is provided [here](./helm/). 
 

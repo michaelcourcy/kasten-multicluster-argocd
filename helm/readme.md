@@ -1,8 +1,19 @@
+# Goal
+
+Often you want to use helm with argocd when you have multiple clusters to manage.
+
+By separating template and variables you create a better normalization of your deployment accross your clusters.
+
 # manage multicluster deployment with helm
 
-If your deployment are all managed by helm and argo you'll have to encapsulate the instruction [described here](../readme.md) with helm charts.
+We have encapsulated the instruction [described here](../readme.md) with helm charts.
 
-The primary helm chart make sure that the secondary cluster resource and primary rersources are removed in the right order with a pre-delete hooks.
+The primary helm chart 
+- is deployed in the kasten-io-mc namespace, this namespace can be created by helm or argocd.
+- make sure that the secondary cluster resource and primary cluster rersources are removed in the right order with a pre-delete hooks.
+
+The secondary helm chart is deployed in the alrady existing kasten-io namespace.
+
 
 ## Do not bind the lifecycle of kasten deployment with the multicluster deployment
 
@@ -57,6 +68,7 @@ spec:
     syncOptions:
     - CreateNamespace=true
 EOF
+
 cat <<EOF | kubectl create -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
