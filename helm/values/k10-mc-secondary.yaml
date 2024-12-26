@@ -1,0 +1,6 @@
+enabled: true
+primaryUrl: https://kasten.mcourcy-primary.customers.kastenevents.com/k10
+secondaryUrl: https://kasten.mcourcy-secondary.customers.kastenevents.com/k10
+name: secondary
+clusterSecretStore: azurekv-mcourcy-join-tokens-store
+remoteKey: mcourcy-multicluster10-join-token

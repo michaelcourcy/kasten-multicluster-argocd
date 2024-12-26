@@ -1,0 +1,5 @@
+enabled: true
+primaryUrl: https://kasten.mcourcy-primary.customers.kastenevents.com/k10
+name: primary
+clusterSecretStore: azurekv-mcourcy-join-tokens-store
+remoteKey: mcourcy-multicluster10-join-token

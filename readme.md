@@ -96,9 +96,11 @@ https://docs.kasten.io/latest/multicluster/how-tos/disconnect.html
 ## On the primary 
 
 ```
-kubectl delete cluster secondary -n kasten-io-mc 
-# wait for the primary cleaning up resource on the secondary
-kubectl delete cluster primary -n kasten-io-mc
+kubectl delete  applications.argoproj.io -n argocd --all
+kubectl delete clusters.dist.kio.kasten.io -n kasten-io-mc -l dist.kio.kasten.io/cluster-type=secondary
+# Wait for the deletion of the secondaries artifacts on the other secondaries clusters
+sleep 10
+kubectl delete clusters.dist.kio.kasten.io -n kasten-io-mc -l dist.kio.kasten.io/cluster-type=primary
 kubectl delete -n kasten-io-mc pushsecret mcourcy-multicluster1-join-token
 kubectl delete ns kasten-io-mc
 ```
@@ -107,6 +109,9 @@ kubectl delete ns kasten-io-mc
 
 ```
 kubectl delete -n kasten-io externalsecrets.external-secrets.io mc-join
+# if deletion was clean on the primary those actions are useless
+kubectl delete -n kasten-io cm mc-join-config
+kubectl delete -n kasten-io secret mc-cluster-info
 ```
 
 

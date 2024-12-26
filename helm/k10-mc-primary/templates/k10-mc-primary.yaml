@@ -1,0 +1,52 @@
+{{ if .Values.enabled }}
+---
+apiVersion: dist.kio.kasten.io/v1alpha1
+kind: Bootstrap
+metadata:
+ annotations:
+    argocd.argoproj.io/sync-wave: "0"
+ name: bootstrap-primary
+ namespace: kasten-io-mc
+spec:
+ clusters:
+     primary-cluster:
+         name: {{ .Values.name }}
+         primary: true
+         k10:
+             namespace: kasten-io
+             releaseName: k10
+             ingress:
+                 url: {{ .Values.primaryUrl }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+ annotations:
+    argocd.argoproj.io/sync-wave: "1"
+ name: join-token-secret
+ namespace: kasten-io-mc
+type: dist.kio.kasten.io/join-token
+---
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: mcourcy-multicluster1-join-token
+  namespace: kasten-io-mc
+spec:
+  refreshInterval: 1h # Refresh interval for which push secret will reconcile
+  deletionPolicy: Delete
+  updatePolicy: Replace
+  secretStoreRefs: # A list of secret stores to push secrets to
+    - name: {{ .Values.clusterSecretStore }}
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      name: join-token-secret
+  data:
+    - match:
+        secretKey: token
+        remoteRef:
+          remoteKey: {{ .Values.remoteKey }}
+{{- end }}

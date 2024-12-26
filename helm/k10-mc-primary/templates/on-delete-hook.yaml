@@ -1,0 +1,59 @@
+{{ if .Values.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-cleaner 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k10-mc-admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kasten-io-mc
+---
+# Hook to remove all the secondaries cluster and the primary cluster
+# because those resources are not managed by helm but must be removed before release deletion
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-cleaner"
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-cleaner"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pre-delete-job
+        image: "bitnami/kubectl:latest"
+        command: 
+          - bash
+          - -o
+          - errexit
+          - -o
+          - pipefail
+          - -c
+          - |
+            kubectl delete clusters.dist.kio.kasten.io -n kasten-io-mc -l dist.kio.kasten.io/cluster-type=secondary
+            # Wait for the deletion of the secondaries artifacts on the other secondaries clusters
+            sleep 10
+            kubectl delete clusters.dist.kio.kasten.io -n kasten-io-mc -l dist.kio.kasten.io/cluster-type=primary            
+---
+{{- end }}
